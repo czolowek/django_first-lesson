@@ -1,30 +1,52 @@
-from datetime import date
+```python
+import os
+import sys
+from django.conf import settings
+from django.core.management import execute_from_command_line
+from django.db import models
+from django.http import HttpResponse
+from django.urls import path
 
-NAME = "Глеб"
-SURNAME = "Кльос"
-BIRTHDAY = date(2005, 5, 20)
-MAIL = "[example@gmail.com](mailto:example@gmail.com)"
+# --- Налаштування Django ---
+BASE_DIR = os.path.dirname(__file__)
+settings.configure(
+    DEBUG=True,
+    SECRET_KEY="secret",
+    ROOT_URLCONF=__name__,
+    ALLOWED_HOSTS=["*"],
+    DATABASES={
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
+    },
+    INSTALLED_APPS=[
+        "django.contrib.contenttypes",
+        "django.contrib.auth",
+        "mainapp",  # наша апка
+    ],
+)
 
-class Person:
-def **init**(self, name, surname, birthday, mail):
-self.name = name
-self.surname = surname
-self.birthday = birthday
-self.age = self.calculate_age()
-self.mail = mail
+# --- Модель ---
+class Person(models.Model):
+    first_name = models.CharField(max_length=30)     # ім’я
+    last_name = models.CharField(max_length=30)      # прізвище
+    birth_date = models.DateField()                  # дата народження
+    age = models.IntegerField()                      # вік
+    email = models.CharField(max_length=100)         # пошта
 
+    class Meta:
+        app_label = "mainapp"
+
+# --- View ---
+def home(request):
+    return HttpResponse("Django працює! Спробуй додати/подивитись базу через ORM.")
+
+urlpatterns = [
+    path("", home),
+]
+
+# --- Запуск ---
+if __name__ == "__main__":
+    execute_from_command_line(sys.argv)
 ```
-def calculate_age(self):
-    today = date.today()
-    years = today.year - self.birthday.year
-    if (today.month, today.day) < (self.birthday.month, self.birthday.day):
-        years -= 1
-    return years
-
-def __str__(self):
-    return f"Ім'я: {self.name}\nПрізвище: {self.surname}\nДата народження: {self.birthday}\nВік: {self.age}\nПошта: {self.mail}"
-```
-
-if name == "**main**":
-person = Person(NAME, SURNAME, BIRTHDAY, MAIL)
-print(person)
